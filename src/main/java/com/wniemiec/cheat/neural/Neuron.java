@@ -12,11 +12,14 @@ public class Neuron implements Inputable {
 
     private static final long serialVersionUID = 4675925185667735286L;
 
-    private List<Synapse> synapses = new LinkedList<>();
+    private List<Synapse> inputs = new LinkedList<>();
+    private List<Synapse> outputs = new LinkedList<>();
+    private Double error;
+    private Double propagatedValue;
     private ActivationFunction activationFunction = new BipolarSigmoidalFunction();
 
     public Neuron() {
-        synapses.add(new Synapse(new Bias(), Math.random()));
+        inputs.add(new Synapse(new Bias(), this, Math.random()));
     }
 
     public Neuron(ActivationFunction activationFunction) {
@@ -26,25 +29,55 @@ public class Neuron implements Inputable {
 
     @Override
     public Double get() {
-        return activationFunction.apply(sumInputs());
+        return propagatedValue;
     }
 
-    private Double sumInputs() {
-        return synapses.stream()
-                .mapToDouble(Synapse::toDouble)
+    void doPropagation() {
+        propagatedValue = activationFunction.apply(sumInputs());
+    }
+
+    void doBackPropagation() {
+        error = outputs.stream()
+                .mapToDouble(Synapse::getWeightedError)
                 .sum();
     }
 
-    public void connect(Collection<? extends Inputable> inputables) {
-        inputables.forEach(synapse -> synapses.add(new Synapse(synapse, Math.random())));
+    private double sumInputs() {
+        return inputs.stream()
+                .mapToDouble(Synapse::getWeightedInput)
+                .sum();
     }
 
-    public static Builder builder() {
-        return new Builder();
+    /**
+     * Creates synapses between Neuron and inputs
+     * @param inputs - elements to connect
+     */
+    void connect(Collection<? extends Inputable> inputs) {
+        for (Inputable input : inputs) {
+            Synapse synapse = new Synapse(input, this, Math.random());
+            this.inputs.add(synapse);
+
+            if (input instanceof Neuron) {
+                ((Neuron)input).outputs.add(synapse);
+            }
+        }
     }
 
     public void setActivationFunction(ActivationFunction activationFunction) {
         this.activationFunction = activationFunction;
+    }
+
+
+    public Double getError() {
+        return error;
+    }
+
+    public void setError(Double error) {
+        this.error = error;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {

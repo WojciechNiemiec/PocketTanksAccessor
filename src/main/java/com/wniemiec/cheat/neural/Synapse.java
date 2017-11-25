@@ -1,38 +1,24 @@
 package com.wniemiec.cheat.neural;
 
-import java.util.Objects;
-
+/**
+ * This class represents a weighted connection between two elements in neural Network
+ */
 public class Synapse {
-    private Inputable inputable;
+    private Inputable input;
+    private Neuron output;
     private Double weight;
-    private Double error;
-    private Double lastOutput;
 
-    Synapse(Inputable input, Double weight) {
-        this.inputable = input;
+    Synapse(Inputable input, Neuron output, Double weight) {
+        this.input = input;
+        this.output = output;
         this.weight = weight;
     }
 
-    Double toDouble() {
-        return getLastOutput() * weight;
+    Double getWeightedInput() {
+        return input.get() * weight;
     }
 
-    private Double getLastOutput() {
-        if (Objects.isNull(lastOutput)) {
-            lastOutput = inputable.get();
-        }
-        return lastOutput;
-    }
-
-    public void cleanUp() {
-        lastOutput = null;
-    }
-
-    public Double getError() {
-        return error;
-    }
-
-    public void setError(Double error) {
-        this.error = error;
+    Double getWeightedError() {
+        return output.getError() * weight;
     }
 }

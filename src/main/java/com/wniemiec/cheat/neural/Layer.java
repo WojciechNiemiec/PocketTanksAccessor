@@ -3,15 +3,14 @@ package com.wniemiec.cheat.neural;
 import java.io.Serializable;
 import java.util.*;
 
-public class Layer<T extends Inputable> implements Serializable, Iterator<Layer<Neuron>> {
+public class Layer<T extends Inputable> implements Serializable {
 
     private static final long serialVersionUID = -8678713589097858309L;
 
     private List<T> inputs;
-    private Layer<Neuron> next;
     private String alias;
 
-    private Layer(Collection<T> inputs) {
+    Layer(Collection<T> inputs) {
         this.inputs = new ArrayList<>(inputs);
     }
 
@@ -20,20 +19,8 @@ public class Layer<T extends Inputable> implements Serializable, Iterator<Layer<
     }
 
     Layer<Neuron> connect(Layer<Neuron> layer) {
-        next = layer;
-        next.getInputs().forEach(neuron -> neuron.connect(this.getInputs()));
-
-        return next;
-    }
-
-    @Override
-    public boolean hasNext() {
-        return Objects.nonNull(next);
-    }
-
-    @Override
-    public Layer<Neuron> next() {
-        return next;
+        layer.getInputs().forEach(neuron -> neuron.connect(this.getInputs()));
+        return layer;
     }
 
     public static <T extends Inputable> Builder<T> builder() {

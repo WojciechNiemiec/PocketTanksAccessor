@@ -1,18 +1,16 @@
 package com.wniemiec.cheat.neural;
 
-import org.apache.commons.lang3.BooleanUtils;
-
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
 
 public class Network implements Serializable {
 
     private static final long serialVersionUID = -7792455019136293876L;
 
-    private Layer<InputProperty> inputLayer;
+    private Layer<Inputable> inputLayer;
+    private LinkedList<Layer<Neuron>> hiddenLayers;
     private Layer<Neuron> outputLayer;
 
     public Layer getInputLayer() {
@@ -24,20 +22,18 @@ public class Network implements Serializable {
     }
 
     public void doPropagation() {
-        if (BooleanUtils.isFalse(inputLayer.hasNext())) {
-            throw new IllegalStateException("Neural network does not contain any Neural layer");
-        }
-
-        Layer<Neuron> layer = inputLayer.next();
-
-        while (Objects.nonNull(layer)) {
-            layer.getInputs().forEach(Neuron::get);
-            layer = layer.next();
-        }
+        hiddenLayers.forEach(neuronLayer -> neuronLayer.getInputs()
+                .forEach(Neuron::doPropagation));
     }
 
+    //TODO: Init errors for output layer firs
     public void doBackPropagation() {
+        Iterator<Layer<Neuron>> descendingIterator = hiddenLayers.descendingIterator();
 
+        while (descendingIterator.hasNext()) {
+            Layer<Neuron> next = descendingIterator.next();
+            next.getInputs().forEach(Neuron::doBackPropagation);
+        }
     }
 
     public static Builder builder() {
@@ -45,13 +41,13 @@ public class Network implements Serializable {
     }
 
     public static class Builder {
-        private Layer<InputProperty> inputLayer;
-        private List<Layer<Neuron>> hiddenLayers = new LinkedList<>();
+        private Layer<Inputable> inputLayer;
+        private LinkedList<Layer<Neuron>> hiddenLayers = new LinkedList<>();
         private Layer<Neuron> outputLayer;
         private boolean autoConnectionEnabled;
         private boolean useGeneratedHiddenLayer;
 
-        public Builder addInputLayer(Layer<InputProperty> layer) {
+        public Builder addInputLayer(Layer<Inputable> layer) {
             inputLayer = layer;
             return this;
         }
@@ -79,18 +75,23 @@ public class Network implements Serializable {
         public Network build() {
             Network network = new Network();
             network.inputLayer = inputLayer;
+            network.hiddenLayers = getHiddenLayers();
             network.outputLayer = outputLayer;
-
-            if (useGeneratedHiddenLayer) {
-                //TODO: log
-                hiddenLayers = Collections.singletonList(new HiddenLayerGenerator().generate(inputLayer, outputLayer));
-            }
 
             if (autoConnectionEnabled) {
                 prepareConnections();
             }
 
             return network;
+        }
+
+        private LinkedList<Layer<Neuron>> getHiddenLayers() {
+            if (useGeneratedHiddenLayer) {
+                return new LinkedList<>(Collections.singletonList(
+                        HiddenLayerGenerator.generate(inputLayer, outputLayer)));
+            } else {
+                return hiddenLayers;
+            }
         }
 
         private void prepareConnections() {

@@ -5,17 +5,19 @@ import com.wniemiec.cheat.ptanks.PocketTanksAccessor;
 import com.wniemiec.cheat.ptanks.Position;
 import com.wniemiec.cheat.ptanks.Tank;
 import com.wniemiec.cheat.ptanks.TankAccessor;
+import lombok.extern.log4j.Log4j;
 
+@Log4j
 public class App {
     public static void main( String[] args ) {
         System.out.println(System.getProperty("java.library.path"));
         System.out.println();
 
         Network network = Network.builder()
-                .addInputLayer(Layer.<InputProperty>builder()
-                        .add(new SomeInput(3.0))
-                        .add(new SomeInput(3.0))
-                        .add(new SomeInput(3.0))
+                .addInputLayer(Layer.builder()
+//                        .add(new SomeInput(3.0))
+//                        .add(new SomeInput(3.0))
+//                        .add(new SomeInput(3.0))
                         .alias("Input Layer")
                         .build())
                 .generateHiddenLayer()
@@ -54,17 +56,18 @@ public class App {
     }
 }
 
-class SomeInput extends InputProperty {
-
-    private Double val;
-
-    SomeInput(Double val) {
-        super(new BipolarValueCompresser(300.0));
-        this.val = val;
-    }
-
-    @Override
-    protected Double getActualValue() {
-        return val;
-    }
-}
+//class SomeInput extends InputProperty {
+//
+//    private static final long serialVersionUID = -3478919047247569847L;
+//    private Double val;
+//
+//    SomeInput(Double val) {
+//        super(new BipolarValueCompresser(300.0));
+//        this.val = val;
+//    }
+//
+//    @Override
+//    protected Double getActualValue() {
+//        return val;
+//    }
+//}
