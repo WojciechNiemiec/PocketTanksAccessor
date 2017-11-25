@@ -8,15 +8,15 @@ import java.util.List;
 /**
  * @author Wojciech Niemiec
  */
-public class Neuron implements Synapse {
+public class Neuron implements Inputable {
 
     private static final long serialVersionUID = 4675925185667735286L;
 
-    private List<Input> inputs = new LinkedList<>();
+    private List<Synapse> synapses = new LinkedList<>();
     private ActivationFunction activationFunction = new BipolarSigmoidalFunction();
 
     public Neuron() {
-        inputs.add(new Input(new Bias(), Math.random()));
+        synapses.add(new Synapse(new Bias(), Math.random()));
     }
 
     public Neuron(ActivationFunction activationFunction) {
@@ -30,13 +30,13 @@ public class Neuron implements Synapse {
     }
 
     private Double sumInputs() {
-        return inputs.stream()
-                .mapToDouble(Input::toDouble)
+        return synapses.stream()
+                .mapToDouble(Synapse::toDouble)
                 .sum();
     }
 
-    public void connect(Collection<? extends Synapse> synapses) {
-        synapses.forEach(synapse -> inputs.add(new Input(synapse, Math.random())));
+    public void connect(Collection<? extends Inputable> inputables) {
+        inputables.forEach(synapse -> synapses.add(new Synapse(synapse, Math.random())));
     }
 
     public static Builder builder() {
@@ -49,14 +49,14 @@ public class Neuron implements Synapse {
 
     public static class Builder {
         private ActivationFunction activationFunction;
-        private Collection<Synapse> synapses = new ArrayList<>();
+        private Collection<Inputable> synapses = new ArrayList<>();
 
         public Builder activationFunction(ActivationFunction activationFunction) {
             this.activationFunction = activationFunction;
             return this;
         }
 
-        public Builder addInputs(Collection<Synapse> synapses) {
+        public Builder addInputs(Collection<Inputable> synapses) {
             this.synapses.addAll(synapses);
             return this;
         }

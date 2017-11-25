@@ -2,17 +2,17 @@ package com.wniemiec.cheat.neural;
 
 class HiddenLayerGenerator {
 
-    Layer generate(Layer inputLayer, Layer outputLayer) {
-        Layer layer = new Layer();
+    Layer<Neuron> generate(Layer inputLayer, Layer outputLayer) {
+        Layer.Builder<Neuron> builder = Layer.builder();
         for (int i = 0; i < countNeuronsNeeded(inputLayer, outputLayer); i++) {
-            layer.add(new Neuron());
+            builder.add(new Neuron());
         }
-        return layer;
+        return builder.alias("Generated Hidden Layer").build();
     }
 
     private int countNeuronsNeeded(Layer inputLayer, Layer outputLayer) {
-        int inputSize = inputLayer.getNeurons().size();
-        int outputSize = outputLayer.getNeurons().size();
+        int inputSize = inputLayer.getInputs().size();
+        int outputSize = outputLayer.getInputs().size();
 
         return (int) Math.sqrt(inputSize * outputSize);
     }

@@ -1,14 +1,17 @@
 package com.wniemiec.cheat.neural;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
-public class DefaultConnector implements Connector {
+public class DefaultConnector implements Connector<Neuron, InputProperty> {
 
     @Override
-    public void connect(Layer input, Layer output, Collection<Layer> hidden) {
-        Layer last = input;
+    public void connect(Layer<InputProperty> input, Layer<Neuron> output, Collection<Layer<Neuron>> hidden) {
+        LinkedList<Layer<Neuron>> hiddenLayers = new LinkedList<>(hidden);
 
-        for (Layer layer: hidden) {
+        Layer<Neuron> last = input.connect(hiddenLayers.pollFirst());
+
+        for (Layer<Neuron> layer: hiddenLayers) {
             last = last.connect(layer);
         }
 

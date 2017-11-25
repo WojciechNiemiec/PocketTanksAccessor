@@ -68,8 +68,8 @@ public class Tank {
     public String toString() {
         return "Tank{" +
                 "position=" + getPosition() + ", " +
-                "power=" + getAngle() + ", " +
-                "angle=" + getPower() +
+                "angle=" + getAngle() + ", " +
+                "power=" + getPower() +
                 '}';
     }
 }

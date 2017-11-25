@@ -15,7 +15,7 @@ public class BipolarSigmoidalFunction implements ActivationFunction {
     }
 
     @Override
-    public Double apply(Double x) {
+    public final Double apply(Double x) {
         return  (1 - Math.pow(Math.E, -beta * x)) /
                 (1 + Math.pow(Math.E, -beta * x));
     }

@@ -1,35 +1,41 @@
 package com.wniemiec.cheat;
 
-import com.wniemiec.cheat.neural.Layer;
-import com.wniemiec.cheat.neural.Network;
-import com.wniemiec.cheat.neural.Neuron;
+import com.wniemiec.cheat.neural.*;
 import com.wniemiec.cheat.ptanks.PocketTanksAccessor;
 import com.wniemiec.cheat.ptanks.Position;
-import com.wniemiec.cheat.ptanks.TankAccessor;
 import com.wniemiec.cheat.ptanks.Tank;
+import com.wniemiec.cheat.ptanks.TankAccessor;
 
 public class App {
     public static void main( String[] args ) {
         System.out.println(System.getProperty("java.library.path"));
         System.out.println();
 
-        try {
-            getProperties();
+        Network network = Network.builder()
+                .addInputLayer(Layer.<InputProperty>builder()
+                        .add(new SomeInput(3.0))
+                        .add(new SomeInput(3.0))
+                        .add(new SomeInput(3.0))
+                        .alias("Input Layer")
+                        .build())
+                .generateHiddenLayer()
+                .addOutputLayer(Layer.<Neuron>builder()
+                        .add(new Neuron())
+                        .add(new Neuron())
+                        .alias("Output Layer")
+                        .build())
+                .enableAutoConnection()
+                .build();
 
-            Network tankNetwork = Network.builder()
-                    .addInputLayer(new Layer(new Neuron(), new Neuron(), new Neuron()))
-                    .generateHiddenLayer()
-                    .addOutputLayer(new Layer(new Neuron(), new Neuron(), new Neuron()))
-                    .enableAutoConnection()
-                    .build();
-
-            tankNetwork.doPropagation();
-            Layer outputLayer = tankNetwork.getOutputLayer();
+        network.doPropagation();
+        network.getOutputLayer();
 
 
-        } finally {
-            PocketTanksAccessor.closeProcess();
-        }
+//        try {
+//            getProperties();
+//        } finally {
+//            PocketTanksAccessor.closeProcess();
+//        }
     }
 
     private static void getProperties() {
@@ -45,5 +51,20 @@ public class App {
         player.setPosition(new Position(10,10));
 
         System.out.println(player);
+    }
+}
+
+class SomeInput extends InputProperty {
+
+    private Double val;
+
+    SomeInput(Double val) {
+        super(new BipolarValueCompresser(300.0));
+        this.val = val;
+    }
+
+    @Override
+    protected Double getActualValue() {
+        return val;
     }
 }
