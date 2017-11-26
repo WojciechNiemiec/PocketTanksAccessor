@@ -26,7 +26,10 @@ public class Network implements Serializable {
         doPropagation(outputLayer);
     }
 
-    //TODO: Init errors for output layer first
+    public void doBackPropagationForOutput(Double error) {
+
+    }
+
     public void doBackPropagation() {
         Iterator<Layer<Neuron>> descendingIterator = hiddenLayers.descendingIterator();
 

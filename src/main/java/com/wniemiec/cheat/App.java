@@ -16,56 +16,67 @@ public class App {
 
         Double[][] matrix = {{-1.0,-1.0,-1.0},
                             {-1.0,1.0,1.0},
-                            {1.0,-1.0,1.0},
-                            {1.0,1.0,-1.0}};
+                            {1.0,1.0,-1.0},
+                            {1.0,-1.0,1.0}};
 
         Input a = new Input();
         Input b = new Input();
 
         Network network = net(a, b);
 
-        for (int i = 0; i < 100; i++) {
-            if (i == 95) {
-                i++;
-            }
+        for (int i = 0; i < 50000; i++){
 
-            for (Double[] vector: matrix) {
-                a.set(vector[0]);
-                b.set(vector[1]);
+            int vec = (int)Math.round(Math.random() * 3);
 
-                network.doPropagation();
-                Neuron result = getOutputNeuron(network);
+            Double[] vector = matrix[vec];
+            Double err;
 
-                Double res = result.get();
-                Double exp = vector[2];
-                Double err = exp - res;
-                result.setError(err);
+            a.set(vector[0]);
+            b.set(vector[1]);
 
-                network.doBackPropagation();
-                network.updateNeuronInputWeights();
-            }
+            network.doPropagation();
+            Neuron result = getOutputNeuron(network);
+
+            Double res = result.get();
+            Double exp = vector[2];
+            err = exp - res;
+
+            result.doBackPropagation(err);
+
+            network.doBackPropagation();
+            network.updateNeuronInputWeights();
+            b.set(vector[1]);
         }
 
+        Double xor;
 
-//        Network network = Network.builder()
-//                .addInputLayer(Layer.builder()
-//                        .add((Inputable) () -> 1.0)
-//                        .add((Inputable) () -> 1.0)
-//                        .add((Inputable) () -> 1.0)
-//                        .alias("Input Layer")
-//                        .build())
-//                .generateHiddenLayer()
-//                .addOutputLayer(Layer.<Neuron>builder()
-//                        .add(new Neuron())
-//                        .add(new Neuron())
-//                        .alias("Output Layer")
-//                        .build())
-//                .enableAutoConnection()
-//                .build();
-//
-//        network.doPropagation();
-//        network.getOutputLayer().getElements().forEach(neuron -> System.out.println(neuron.getOutputNeuron() + ", "));
+        a.set(-1.0);
+        b.set(-1.0);
+        network.doPropagation();
+        xor = getOutputNeuron(network).get();
 
+        System.out.println("-1 xor -1 = " + xor);
+
+        a.set(-1.0);
+        b.set(1.0);
+        network.doPropagation();
+        xor = getOutputNeuron(network).get();
+
+        System.out.println("-1 xor 1 = " + xor);
+
+        a.set(1.0);
+        b.set(-1.0);
+        network.doPropagation();
+        xor = getOutputNeuron(network).get();
+
+        System.out.println("1 xor -1 = " + xor);
+
+        a.set(1.0);
+        b.set(1.0);
+        network.doPropagation();
+        xor = getOutputNeuron(network).get();
+
+        System.out.println("1 xor 1 = " + xor);
 
 //        try {
 //            getProperties();
@@ -111,22 +122,6 @@ public class App {
         player.setPosition(new Position(10,10));
 
         System.out.println(player);
-    }
-}
-
-class SomeInput extends InputProperty {
-
-    private static final long serialVersionUID = -3478919047247569847L;
-    private Double val;
-
-    SomeInput(Double val) {
-        super(new BipolarValueCompresser(300.0));
-        this.val = val;
-    }
-
-    @Override
-    protected Double getActualValue() {
-        return val;
     }
 }
 

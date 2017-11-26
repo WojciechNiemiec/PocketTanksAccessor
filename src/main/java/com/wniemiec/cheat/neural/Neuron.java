@@ -4,20 +4,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author Wojciech Niemiec
  */
 public class Neuron implements Inputable {
-
     private static final long serialVersionUID = 4675925185667735286L;
 
+    private final static Double BIAS = 1.0;
+    private final static Double RO = 0.2;
+
+    private Synapse bias = new Synapse(() -> BIAS, this, Math.random());
     private List<Synapse> inputs = new LinkedList<>();
-//    private Synapse bias = new Synapse(new Bias(), this, Math.random());
     private List<Synapse> outputs = new LinkedList<>();
     private Double error;
-    private Double propagatedValue;
-    private Double backPropagatedValue;
+    private Double activatedValue;
     private ActivationFunction activationFunction;
 
     public Neuron() {
@@ -30,29 +32,41 @@ public class Neuron implements Inputable {
 
     @Override
     public Double get() {
-        return propagatedValue;
+        return activatedValue;
     }
 
     void doPropagation() {
-        propagatedValue = activationFunction.apply(sumInputs());
+        activatedValue = activationFunction.apply(sumInputs());
+    }
+
+    public void doBackPropagation(Double propagatedError) {
+        Double activatedDerivative = activationFunction.applyDerivative(activatedValue);
+
+        error = activatedDerivative * propagatedError;
     }
 
     void doBackPropagation() {
-        error = outputs.stream()
+        doBackPropagation(getWeightedErrorSum());
+    }
+
+    private double getWeightedErrorSum() {
+        return outputs.stream()
                 .mapToDouble(Synapse::getWeightedError)
                 .sum();
     }
 
     void updateInputWeights() {
-        for (Synapse input : inputs) {
-            Double weight = input.getWeight() +
-                    error * activationFunction.applyDerivative(propagatedValue) * input.getInput();
-            input.setWeight(weight);
-        }
+        updateWeight(bias);
+        inputs.forEach(this::updateWeight);
+    }
+
+    private void updateWeight(Synapse synapse) {
+        Double newWeight = synapse.getWeight() + (RO * error * synapse.getInput());
+        synapse.setWeight(newWeight);
     }
 
     private double sumInputs() {
-        return inputs.stream()
+        return bias.getWeightedInput() + inputs.stream()
                 .mapToDouble(Synapse::getWeightedInput)
                 .sum();
     }
@@ -63,7 +77,7 @@ public class Neuron implements Inputable {
      */
     void connect(Collection<? extends Inputable> inputs) {
         for (Inputable input : inputs) {
-            Synapse synapse = new Synapse(input, this, Math.random());
+            Synapse synapse = new Synapse(input, this, Math.random() - 0.5);
             this.inputs.add(synapse);
 
             if (input instanceof Neuron) {
