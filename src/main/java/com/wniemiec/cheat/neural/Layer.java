@@ -7,19 +7,19 @@ public class Layer<T extends Inputable> implements Serializable {
 
     private static final long serialVersionUID = -8678713589097858309L;
 
-    private List<T> inputs;
+    private List<T> elements;
     private String alias;
 
-    Layer(Collection<T> inputs) {
-        this.inputs = new ArrayList<>(inputs);
+    Layer(Collection<T> elements) {
+        this.elements = new ArrayList<>(elements);
     }
 
-    List<T> getInputs() {
-        return inputs;
+    public List<T> getElements() {
+        return elements;
     }
 
     Layer<Neuron> connect(Layer<Neuron> layer) {
-        layer.getInputs().forEach(neuron -> neuron.connect(this.getInputs()));
+        layer.getElements().forEach(neuron -> neuron.connect(this.getElements()));
         return layer;
     }
 

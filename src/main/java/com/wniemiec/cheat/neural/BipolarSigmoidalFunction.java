@@ -8,7 +8,7 @@ public class BipolarSigmoidalFunction implements ActivationFunction {
     private double beta;
 
     public BipolarSigmoidalFunction() {
-        beta = 1.0;
+        beta = 0.5;
     }
 
     public BipolarSigmoidalFunction(double beta) {
@@ -29,6 +29,6 @@ public class BipolarSigmoidalFunction implements ActivationFunction {
 
     @Override
     public Double applyDerivative(Double aDouble) {
-        return 0.5 * (1 - Math.pow(aDouble, 2.0));
+        return beta * (1 - Math.pow(aDouble, 2.0));
     }
 }

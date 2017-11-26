@@ -13,17 +13,18 @@ public class Neuron implements Inputable {
     private static final long serialVersionUID = 4675925185667735286L;
 
     private List<Synapse> inputs = new LinkedList<>();
+//    private Synapse bias = new Synapse(new Bias(), this, Math.random());
     private List<Synapse> outputs = new LinkedList<>();
     private Double error;
     private Double propagatedValue;
-    private ActivationFunction activationFunction = new BipolarSigmoidalFunction();
+    private Double backPropagatedValue;
+    private ActivationFunction activationFunction;
 
     public Neuron() {
-        inputs.add(new Synapse(new Bias(), this, Math.random()));
+        activationFunction = new BipolarSigmoidalFunction();
     }
 
     public Neuron(ActivationFunction activationFunction) {
-        this();
         this.activationFunction = activationFunction;
     }
 
@@ -40,6 +41,14 @@ public class Neuron implements Inputable {
         error = outputs.stream()
                 .mapToDouble(Synapse::getWeightedError)
                 .sum();
+    }
+
+    void updateInputWeights() {
+        for (Synapse input : inputs) {
+            Double weight = input.getWeight() +
+                    error * activationFunction.applyDerivative(propagatedValue) * input.getInput();
+            input.setWeight(weight);
+        }
     }
 
     private double sumInputs() {

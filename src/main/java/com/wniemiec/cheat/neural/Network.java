@@ -13,27 +13,41 @@ public class Network implements Serializable {
     private LinkedList<Layer<Neuron>> hiddenLayers;
     private Layer<Neuron> outputLayer;
 
-    public Layer getInputLayer() {
+    public Layer<Inputable> getInputLayer() {
         return inputLayer;
     }
 
-    public Layer getOutputLayer() {
+    public Layer<Neuron> getOutputLayer() {
         return outputLayer;
     }
 
     public void doPropagation() {
-        hiddenLayers.forEach(neuronLayer -> neuronLayer.getInputs()
-                .forEach(Neuron::doPropagation));
+        hiddenLayers.forEach(this::doPropagation);
+        doPropagation(outputLayer);
     }
 
-    //TODO: Init errors for output layer firs
+    //TODO: Init errors for output layer first
     public void doBackPropagation() {
         Iterator<Layer<Neuron>> descendingIterator = hiddenLayers.descendingIterator();
 
         while (descendingIterator.hasNext()) {
             Layer<Neuron> next = descendingIterator.next();
-            next.getInputs().forEach(Neuron::doBackPropagation);
+            next.getElements().forEach(Neuron::doBackPropagation);
         }
+    }
+    public void updateNeuronInputWeights() {
+        hiddenLayers.forEach(this::updateNeuronInputWeights);
+        updateNeuronInputWeights(outputLayer);
+    }
+
+    private void doPropagation(Layer<Neuron> neuronLayer) {
+        neuronLayer.getElements()
+                .forEach(Neuron::doPropagation);
+    }
+
+    private void updateNeuronInputWeights(Layer<Neuron> neuronLayer) {
+        neuronLayer.getElements()
+                .forEach(Neuron::updateInputWeights);
     }
 
     public static Builder builder() {
@@ -79,7 +93,7 @@ public class Network implements Serializable {
             network.outputLayer = outputLayer;
 
             if (autoConnectionEnabled) {
-                prepareConnections();
+                prepareConnections(network);
             }
 
             return network;
@@ -94,9 +108,9 @@ public class Network implements Serializable {
             }
         }
 
-        private void prepareConnections() {
+        private void prepareConnections(Network network) {
             DefaultConnector connector = new DefaultConnector();
-            connector.connect(inputLayer, outputLayer, hiddenLayers);
+            connector.connect(network.inputLayer, network.outputLayer, network.hiddenLayers);
         }
     }
 }

@@ -13,8 +13,8 @@ class HiddenLayerGenerator {
     }
 
     private static int countNeuronsNeeded(Layer inputLayer, Layer outputLayer) {
-        int inputSize = inputLayer.getInputs().size();
-        int outputSize = outputLayer.getInputs().size();
+        int inputSize = inputLayer.getElements().size();
+        int outputSize = outputLayer.getElements().size();
 
         return (int) Math.sqrt(inputSize * outputSize);
     }

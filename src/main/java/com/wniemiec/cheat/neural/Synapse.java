@@ -14,11 +14,23 @@ public class Synapse {
         this.weight = weight;
     }
 
+    Double getInput() {
+        return input.get();
+    }
+
     Double getWeightedInput() {
         return input.get() * weight;
     }
 
     Double getWeightedError() {
         return output.getError() * weight;
+    }
+
+    Double getWeight() {
+        return weight;
+    }
+
+    void setWeight(Double weight) {
+        this.weight = weight;
     }
 }
