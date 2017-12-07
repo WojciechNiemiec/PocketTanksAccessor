@@ -2,9 +2,9 @@ package com.wniemiec.cheat.neural;
 
 public abstract class InputProperty implements Inputable {
 
-    private ValueCompresser compresser;
+    private ValueCompressor compresser;
 
-    public InputProperty(ValueCompresser compresser) {
+    public InputProperty(ValueCompressor compresser) {
         this.compresser = compresser;
     }
 

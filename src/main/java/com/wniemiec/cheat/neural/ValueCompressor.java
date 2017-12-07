@@ -1,6 +1,6 @@
 package com.wniemiec.cheat.neural;
 
-public interface ValueCompresser {
+public interface ValueCompressor {
     Double compress(Double value);
 
     Double decompress(Double value);

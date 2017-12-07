@@ -1,10 +1,12 @@
 package com.wniemiec.cheat;
 
+import com.wniemiec.cheat.logic.PocketTanksCheater;
 import com.wniemiec.cheat.neural.*;
 import com.wniemiec.cheat.ptanks.PocketTanksAccessor;
 import com.wniemiec.cheat.ptanks.Position;
 import com.wniemiec.cheat.ptanks.Tank;
 import com.wniemiec.cheat.ptanks.TankAccessor;
+import javafx.application.Application;
 import lombok.extern.log4j.Log4j;
 
 @Log4j
@@ -13,6 +15,7 @@ public class App {
         System.out.println(System.getProperty("java.library.path"));
         System.out.println();
 
+        Application.launch(PocketTanksCheater.class);
 
         Double[][] matrix = {{-1.0,-1.0,-1.0},
                             {-1.0,1.0,1.0},
@@ -24,29 +27,29 @@ public class App {
 
         Network network = net(a, b);
 
-        for (int i = 0; i < 50000; i++){
-
-            int vec = (int)Math.round(Math.random() * 3);
-
-            Double[] vector = matrix[vec];
-            Double err;
-
-            a.set(vector[0]);
-            b.set(vector[1]);
-
-            network.doPropagation();
-            Neuron result = getOutputNeuron(network);
-
-            Double res = result.get();
-            Double exp = vector[2];
-            err = exp - res;
-
-            result.doBackPropagation(err);
-
-            network.doBackPropagation();
-            network.updateNeuronInputWeights();
-            b.set(vector[1]);
-        }
+//        for (int i = 0; i < 50000; i++){
+//
+//            int vec = (int)Math.round(Math.random() * 3);
+//
+//            Double[] vector = matrix[vec];
+//            Double err;
+//
+//            a.set(vector[0]);
+//            b.set(vector[1]);
+//
+//            network.doPropagation();
+//            Neuron result = getOutputNeuron(network);
+//
+//            Double res = result.get();
+//            Double exp = vector[2];
+//            err = exp - res;
+//
+//            result.doBackPropagation(err);
+//
+//            network.doBackPropagation();
+//            network.updateNeuronInputWeights();
+//            b.set(vector[1]);
+//        }
 
         Double xor;
 
