@@ -4,12 +4,16 @@ class HiddenLayerGenerator {
 
     private HiddenLayerGenerator() {}
 
-    static Layer<Neuron> generate(Layer inputLayer, Layer outputLayer) {
+    static Layer<Neuron> generate(int neuronsNeeded) {
         Layer.Builder<Neuron> builder = Layer.builder();
-        for (int i = 0; i < countNeuronsNeeded(inputLayer, outputLayer); i++) {
+        for (int i = 0; i < neuronsNeeded; i++) {
             builder.add(new Neuron());
         }
         return builder.alias("Generated Hidden Layer").build();
+    }
+
+    static Layer<Neuron> generate(Layer inputLayer, Layer outputLayer) {
+        return generate(countNeuronsNeeded(inputLayer, outputLayer));
     }
 
     private static int countNeuronsNeeded(Layer inputLayer, Layer outputLayer) {

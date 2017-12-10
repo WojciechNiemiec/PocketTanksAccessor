@@ -91,8 +91,8 @@ class CheatContext {
 
             network.doPropagation();
 
-            powerNeuron.doBackPropagation(powerNeuron.get() - powerCompressor.compress(vector.getCountedPower()));
-            angleNeuron.doBackPropagation(angleNeuron.get() - angleCompressor.compress(vector.getCountedAngle()));
+            powerNeuron.doBackPropagation(powerCompressor.compress(vector.getCountedPower()) - powerNeuron.get());
+            angleNeuron.doBackPropagation(angleCompressor.compress(vector.getCountedAngle()) - angleNeuron.get());
 
             network.doBackPropagation();
             network.updateNeuronInputWeights();
