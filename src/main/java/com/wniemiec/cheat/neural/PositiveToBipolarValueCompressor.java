@@ -1,14 +1,14 @@
 package com.wniemiec.cheat.neural;
 
-public class BipolarValueCompressor implements ValueCompressor {
+public class PositiveToBipolarValueCompressor implements ValueCompressor {
 
     private Double halfRange;
 
-    public BipolarValueCompressor(Double range) {
+    public PositiveToBipolarValueCompressor(Double range) {
         this.halfRange = range / 2;
     }
 
-    public BipolarValueCompressor(Double rangeFrom, Double rangeTo) {
+    public PositiveToBipolarValueCompressor(Double rangeFrom, Double rangeTo) {
         this(Math.abs(rangeTo - rangeFrom));
     }
 

@@ -24,7 +24,7 @@ public class PocketTanksCheater extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         PocketTanksAccessor.closeProcess();
     }
 }

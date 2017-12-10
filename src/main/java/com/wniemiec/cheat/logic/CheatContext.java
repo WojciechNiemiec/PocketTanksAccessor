@@ -9,13 +9,23 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 class CheatContext {
     private static final Double MAX_DISTANCE = 800.0;
     private static final Double MIN_WIND = -100.0;
     private static final Double MAX_WIND = 100.0;
-    private static final Double MAX_POWER = 800.0;
+    private static final Double MAX_POWER = 100.0;
     private static final Double MAX_ANGLE = 180.0;
+
+    private static CheatContext instance;
+
+    static CheatContext getInstance() {
+        if (Objects.isNull(instance)) {
+            instance = new CheatContext();
+        }
+        return instance;
+    }
 
     @Getter
     private Tank playerOne = new Tank(TankAccessor.PLAYER_ONE);
@@ -40,12 +50,12 @@ class CheatContext {
     @Getter
     private Double countedAngle;
 
-    private ValueCompressor distanceCompressor = new BipolarValueCompressor(MAX_DISTANCE);
-    private ValueCompressor windCompressor = new BipolarValueCompressor(MIN_WIND, MAX_WIND);
-    private ValueCompressor powerCompressor = new BipolarValueCompressor(MAX_POWER);
-    private ValueCompressor angleCompressor = new BipolarValueCompressor(MAX_ANGLE);
+    private ValueCompressor distanceCompressor = new SimpleValueCompresser(MAX_DISTANCE);
+    private ValueCompressor windCompressor = new SimpleValueCompresser(MAX_WIND);
+    private ValueCompressor powerCompressor = new PositiveToBipolarValueCompressor(MAX_POWER);
+    private ValueCompressor angleCompressor = new PositiveToBipolarValueCompressor(MAX_ANGLE);
 
-    CheatContext() {
+    private CheatContext() {
         Inputable horizontalDistanceInput = () -> distanceCompressor.compress(horizontalDistance);
         Inputable verticalDistanceInput = () -> distanceCompressor.compress(verticalDistance);
         Inputable windInput = () -> windCompressor.compress(windSpeed);
@@ -69,9 +79,9 @@ class CheatContext {
         learningVectors.add(vector);
     }
 
-    void teach() {
+    void learn() {
         for (int i = 0; i < 50000; i++){
-            int vec = (int)Math.round(Math.random() * learningVectors.size() - 1);
+            int vec = (int)Math.round(Math.random() * (learningVectors.size() - 1));
 
             LearningVector vector = learningVectors.get(vec);
 
@@ -81,8 +91,8 @@ class CheatContext {
 
             network.doPropagation();
 
-            powerNeuron.doBackPropagation(powerNeuron.get() - vector.getCountedPower());
-            angleNeuron.doBackPropagation(angleNeuron.get() - vector.getCountedAngle());
+            powerNeuron.doBackPropagation(powerNeuron.get() - powerCompressor.compress(vector.getCountedPower()));
+            angleNeuron.doBackPropagation(angleNeuron.get() - angleCompressor.compress(vector.getCountedAngle()));
 
             network.doBackPropagation();
             network.updateNeuronInputWeights();

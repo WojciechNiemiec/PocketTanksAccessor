@@ -27,29 +27,29 @@ public class App {
 
         Network network = net(a, b);
 
-//        for (int i = 0; i < 50000; i++){
-//
-//            int vec = (int)Math.round(Math.random() * 3);
-//
-//            Double[] vector = matrix[vec];
-//            Double err;
-//
-//            a.set(vector[0]);
-//            b.set(vector[1]);
-//
-//            network.doPropagation();
-//            Neuron result = getOutputNeuron(network);
-//
-//            Double res = result.get();
-//            Double exp = vector[2];
-//            err = exp - res;
-//
-//            result.doBackPropagation(err);
-//
-//            network.doBackPropagation();
-//            network.updateNeuronInputWeights();
-//            b.set(vector[1]);
-//        }
+        for (int i = 0; i < 50000; i++){
+
+            int vec = (int)Math.round(Math.random() * 3);
+
+            Double[] vector = matrix[vec];
+            Double err;
+
+            a.set(vector[0]);
+            b.set(vector[1]);
+
+            network.doPropagation();
+            Neuron result = getOutputNeuron(network);
+
+            Double res = result.get();
+            Double exp = vector[2];
+            err = exp - res;
+
+            result.doBackPropagation(err);
+
+            network.doBackPropagation();
+            network.updateNeuronInputWeights();
+            b.set(vector[1]);
+        }
 
         Double xor;
 
