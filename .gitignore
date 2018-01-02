@@ -1,5 +1,7 @@
-
 # Created by https://www.gitignore.io/api/c,java,clion,maven,intellij
+
+### own ###
+log/*
 
 ### C ###
 # Prerequisites
