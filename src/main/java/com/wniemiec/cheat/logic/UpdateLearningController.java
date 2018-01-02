@@ -4,9 +4,15 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 public class UpdateLearningController {
     private CheatContext context = CheatContext.getInstance();
+
+    @FXML
+    private GridPane gridPane;
 
     @FXML
     private Label windSpeed;
@@ -31,6 +37,14 @@ public class UpdateLearningController {
     public void save(ActionEvent actionEvent) {
         context.addLearningVector(new LearningVector(context, Double.valueOf(power.getText()), Double.valueOf(angle.getText())));
         context.learn();
+        close();
+    }
+
+    private void close() {
+        Window window = this.gridPane.getScene().getWindow();
+        if (window instanceof Stage) {
+            ((Stage)window).close();
+        }
     }
 
     @FXML

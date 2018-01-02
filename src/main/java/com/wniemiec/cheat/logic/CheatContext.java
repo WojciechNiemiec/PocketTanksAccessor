@@ -9,8 +9,9 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.BooleanUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Objects;
 
 @Log4j
@@ -39,7 +40,9 @@ class CheatContext {
     private Neuron angleNeuron = new Neuron();
 
     private Network network;
-    private List<LearningVector> learningVectors = new ArrayList<>();
+    private LinkedList<LearningVector> learningVectors = new LinkedList<>();
+
+    private Serializer<LinkedList<LearningVector>> serializer = new Serializer<>();
 
     @Getter
     private Double horizontalDistance;
@@ -116,6 +119,20 @@ class CheatContext {
 
     }
 
+    void refreshProperties() {
+        updateInputs();
+        network.doPropagation();
+        updateOutputs();
+    }
+
+    void saveLearningVectors(File file) throws IOException {
+        serializer.serialize(learningVectors, file);
+    }
+
+    void loadLearningVectors(File file) throws IOException, ClassNotFoundException {
+        learningVectors = serializer.deserialize(file);
+    }
+
     private int randomIndex() {
         return (int) Math.round(Math.random() * (learningVectors.size() - 1));
     }
@@ -126,12 +143,6 @@ class CheatContext {
 
     private boolean errorsAreAcceptable(double powerError, double angleError) {
         return Math.abs(powerError) < 0.01 && Math.abs(angleError) < 0.01;
-    }
-
-    void refreshProperties() {
-        updateInputs();
-        network.doPropagation();
-        updateOutputs();
     }
 
     private void updateInputs() {
@@ -147,4 +158,10 @@ class CheatContext {
         countedPower = powerCompressor.decompress(powerNeuron.get());
         countedAngle = angleCompressor.decompress(angleNeuron.get());
     }
+
+    void undoUpdate() {
+        learningVectors.pollLast();
+    }
+
+
 }

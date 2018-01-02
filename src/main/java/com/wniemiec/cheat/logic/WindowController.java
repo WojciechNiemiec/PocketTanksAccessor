@@ -9,12 +9,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 public class WindowController {
     private CheatContext context = CheatContext.getInstance();
+
+    @FXML
+    private VBox vBox;
 
     @FXML
     private Label horizontalDistance;
@@ -57,9 +65,7 @@ public class WindowController {
     @FXML
     private TextField rightAngle;
 
-    public WindowController() {
-
-    }
+    public WindowController() { }
 
     @FXML
     public void refreshProperties(ActionEvent actionEvent) {
@@ -141,5 +147,46 @@ public class WindowController {
         stage.setScene(scene);
         stage.setTitle("Add learning vector");
         stage.show();
+    }
+
+    public void save(ActionEvent actionEvent) throws IOException {
+        FileChooser fileChooser = getFileChooser("Save learning vectors");
+        File file = fileChooser.showSaveDialog(getWindow());
+
+        if (Objects.nonNull(file)) {
+            context.saveLearningVectors(file);
+        }
+    }
+
+    public void open(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
+        FileChooser fileChooser = getFileChooser("Read learning vectors");
+
+        File file = fileChooser.showOpenDialog(getWindow());
+        if (Objects.nonNull(file)) {
+            context.loadLearningVectors(file);
+            context.learn();
+        }
+    }
+
+    public void quit(ActionEvent actionEvent) {
+        Window window = getWindow();
+        if (window instanceof Stage) {
+            ((Stage) window).close();
+        }
+    }
+
+    public void undoUpdate(ActionEvent actionEvent) {
+        context.undoUpdate();
+    }
+
+    private FileChooser getFileChooser(String title) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(title);
+        fileChooser.setInitialDirectory(new File(Serializer.VECTORS_PATH));
+        return fileChooser;
+    }
+
+    private Window getWindow() {
+        return vBox.getScene().getWindow();
     }
 }
