@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author Wojciech Niemiec
@@ -14,6 +13,7 @@ public class Neuron implements Inputable {
 
     private final static Double BIAS = 1.0;
     private final static Double RO = 0.2;
+    private final static Double ALPHA = 0.000009;
 
     private Synapse bias = new Synapse(() -> BIAS, this, Math.random());
     private List<Synapse> inputs = new LinkedList<>();
@@ -61,7 +61,8 @@ public class Neuron implements Inputable {
     }
 
     private void updateWeight(Synapse synapse) {
-        Double newWeight = synapse.getWeight() + (RO * error * synapse.getInput());
+        Double oldWeight = synapse.getWeight();
+        Double newWeight = oldWeight + ALPHA * oldWeight + (RO * error * synapse.getInput());
         synapse.setWeight(newWeight);
     }
 
