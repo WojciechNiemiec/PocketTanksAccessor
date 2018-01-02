@@ -1,6 +1,6 @@
 package com.wniemiec.cheat.neural;
 
-public class BipolarSigmoidalFunction implements ActivationFunction {
+public class BipolarSigmoidFunction implements ActivationFunction {
 
     @Override
     public final Double apply(Double x) {

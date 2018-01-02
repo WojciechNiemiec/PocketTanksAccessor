@@ -23,7 +23,7 @@ public class Neuron implements Inputable {
     private ActivationFunction activationFunction;
 
     public Neuron() {
-        activationFunction = new BipolarSigmoidalFunction();
+        activationFunction = new BipolarSigmoidFunction();
     }
 
     public Neuron(ActivationFunction activationFunction) {
