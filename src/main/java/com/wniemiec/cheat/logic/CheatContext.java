@@ -6,14 +6,17 @@ import com.wniemiec.cheat.ptanks.Position;
 import com.wniemiec.cheat.ptanks.Tank;
 import com.wniemiec.cheat.ptanks.TankAccessor;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Log4j
 class CheatContext {
-    private static final Double MAX_DISTANCE = 800.0;
-    private static final Double MIN_WIND = -100.0;
+    private static final Double MAX_HORIZONTAL_DISTANCE = 800.0;
+    private static final Double MAX_VERTICAL_DISTANCE = 350.0;
     private static final Double MAX_WIND = 100.0;
     private static final Double MAX_POWER = 100.0;
     private static final Double MAX_ANGLE = 180.0;
@@ -50,14 +53,15 @@ class CheatContext {
     @Getter
     private Double countedAngle;
 
-    private ValueCompressor distanceCompressor = new SimpleValueCompresser(MAX_DISTANCE);
-    private ValueCompressor windCompressor = new SimpleValueCompresser(MAX_WIND);
+    private ValueCompressor horizontalCompressor = new SimpleValueCompressor(MAX_HORIZONTAL_DISTANCE);
+    private ValueCompressor verticalCompressor = new SimpleValueCompressor(MAX_VERTICAL_DISTANCE);
+    private ValueCompressor windCompressor = new SimpleValueCompressor(MAX_WIND);
     private ValueCompressor powerCompressor = new PositiveToBipolarValueCompressor(MAX_POWER);
     private ValueCompressor angleCompressor = new PositiveToBipolarValueCompressor(MAX_ANGLE);
 
     private CheatContext() {
-        Inputable horizontalDistanceInput = () -> distanceCompressor.compress(horizontalDistance);
-        Inputable verticalDistanceInput = () -> distanceCompressor.compress(verticalDistance);
+        Inputable horizontalDistanceInput = () -> horizontalCompressor.compress(horizontalDistance);
+        Inputable verticalDistanceInput = () -> verticalCompressor.compress(verticalDistance);
         Inputable windInput = () -> windCompressor.compress(windSpeed);
 
         network = Network.builder()
@@ -66,7 +70,8 @@ class CheatContext {
                         .add(verticalDistanceInput)
                         .add(windInput)
                         .build())
-                .generateHiddenLayer()
+                .addHiddenLayer(HiddenLayerGenerator.generate(5))
+                .addHiddenLayer(HiddenLayerGenerator.generate(5))
                 .addOutputLayer(Layer.<Neuron>builder()
                         .add(powerNeuron)
                         .add(angleNeuron)
@@ -80,10 +85,14 @@ class CheatContext {
     }
 
     void learn() {
-        for (int i = 0; i < 50000; i++){
-            int vec = (int)Math.round(Math.random() * (learningVectors.size() - 1));
+        double powerError;
+        double angleError;
+        int i = 0;
 
-            LearningVector vector = learningVectors.get(vec);
+        log.debug("Learning with parameters: " + learningVectors);
+
+        do {
+            LearningVector vector = learningVectors.get(randomIndex());
 
             horizontalDistance = vector.getHorizontalDistance();
             verticalDistance = vector.getVerticalDistance();
@@ -91,13 +100,32 @@ class CheatContext {
 
             network.doPropagation();
 
-            powerNeuron.doBackPropagation(powerCompressor.compress(vector.getCountedPower()) - powerNeuron.get());
-            angleNeuron.doBackPropagation(angleCompressor.compress(vector.getCountedAngle()) - angleNeuron.get());
+            powerError = powerCompressor.compress(vector.getCountedPower()) - powerNeuron.get();
+            angleError = angleCompressor.compress(vector.getCountedAngle()) - angleNeuron.get();
+            vector.setLearned(errorsAreAcceptable(powerError, angleError));
+
+            log.debug("Iteration number: " + i++);
+            log.debug("Propagated error for power is: " + powerError + ", and for angle is : " + angleError);
+
+            powerNeuron.doBackPropagation(powerError);
+            angleNeuron.doBackPropagation(angleError);
 
             network.doBackPropagation();
             network.updateNeuronInputWeights();
-        }
+        } while (unlearnedVectorPresent());
 
+    }
+
+    private int randomIndex() {
+        return (int) Math.round(Math.random() * (learningVectors.size() - 1));
+    }
+
+    private boolean unlearnedVectorPresent() {
+        return learningVectors.stream().anyMatch(vector -> BooleanUtils.isFalse(vector.isLearned()));
+    }
+
+    private boolean errorsAreAcceptable(double powerError, double angleError) {
+        return Math.abs(powerError) < 0.01 && Math.abs(angleError) < 0.01;
     }
 
     void refreshProperties() {

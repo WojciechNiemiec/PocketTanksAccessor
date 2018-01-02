@@ -1,10 +1,10 @@
 package com.wniemiec.cheat.neural;
 
-class HiddenLayerGenerator {
+public class HiddenLayerGenerator {
 
     private HiddenLayerGenerator() {}
 
-    static Layer<Neuron> generate(int neuronsNeeded) {
+    public static Layer<Neuron> generate(int neuronsNeeded) {
         Layer.Builder<Neuron> builder = Layer.builder();
         for (int i = 0; i < neuronsNeeded; i++) {
             builder.add(new Neuron());

@@ -77,13 +77,18 @@ public class Neuron implements Inputable {
      */
     void connect(Collection<? extends Inputable> inputs) {
         for (Inputable input : inputs) {
-            Synapse synapse = new Synapse(input, this, Math.random() - 0.5);
+            Synapse synapse = new Synapse(input, this, getRandomWeight());
             this.inputs.add(synapse);
 
             if (input instanceof Neuron) {
                 ((Neuron)input).outputs.add(synapse);
             }
         }
+    }
+
+    private double getRandomWeight() {
+        double weight = Math.random() - 0.5;
+        return (-0.05 > weight || weight > 0.05) ? weight : 0.1;
     }
 
     public void setActivationFunction(ActivationFunction activationFunction) {

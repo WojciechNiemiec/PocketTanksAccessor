@@ -1,5 +1,8 @@
 package com.wniemiec.cheat.neural;
 
+import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
@@ -57,6 +60,7 @@ public class Network implements Serializable {
         return new Builder();
     }
 
+    @Log4j
     public static class Builder {
         private Layer<Inputable> inputLayer;
         private LinkedList<Layer<Neuron>> hiddenLayers = new LinkedList<>();
@@ -104,6 +108,10 @@ public class Network implements Serializable {
 
         private LinkedList<Layer<Neuron>> getHiddenLayers() {
             if (useGeneratedHiddenLayer) {
+                if (BooleanUtils.isFalse(hiddenLayers.isEmpty())) {
+                    log.warn("Prepared hidden layers would be overridden by generated single layer");
+                }
+
                 return new LinkedList<>(Collections.singletonList(
                         HiddenLayerGenerator.generate(inputLayer, outputLayer)));
             } else {
