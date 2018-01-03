@@ -6,9 +6,10 @@ package com.wniemiec.cheat.neural;
 public class Synapse {
     private Inputable input;
     private Neuron output;
-    private Double weight;
+    private double oldWeight;
+    private double weight;
 
-    Synapse(Inputable input, Neuron output, Double weight) {
+    Synapse(Inputable input, Neuron output, double weight) {
         this.input = input;
         this.output = output;
         this.weight = weight;
@@ -26,11 +27,19 @@ public class Synapse {
         return output.getError() * weight;
     }
 
-    Double getWeight() {
+    double getOldWeight() {
+        return oldWeight;
+    }
+
+    void setOldWeight(double oldWeight) {
+        this.oldWeight = oldWeight;
+    }
+
+    double getWeight() {
         return weight;
     }
 
-    void setWeight(Double weight) {
+    void setWeight(double weight) {
         this.weight = weight;
     }
 }

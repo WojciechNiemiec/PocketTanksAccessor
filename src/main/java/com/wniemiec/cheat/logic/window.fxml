@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox fx:id="vBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="341.0" prefWidth="694.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      prefHeight="341.0" prefWidth="694.0" xmlns="http://javafx.com/javafx/8.0.151" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.wniemiec.cheat.logic.WindowController">
     <MenuBar prefHeight="25.0" prefWidth="668.0">
         <Menu mnemonicParsing="false" text="File">

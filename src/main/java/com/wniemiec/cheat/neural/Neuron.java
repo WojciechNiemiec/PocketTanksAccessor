@@ -13,7 +13,7 @@ public class Neuron implements Inputable {
 
     private final static Double BIAS = 1.0;
     private final static Double RO = 0.2;
-    private final static Double ALPHA = 0.000009;
+    private final static Double ALPHA = 0.9;
 
     private Synapse bias = new Synapse(() -> BIAS, this, Math.random());
     private List<Synapse> inputs = new LinkedList<>();
@@ -61,8 +61,12 @@ public class Neuron implements Inputable {
     }
 
     private void updateWeight(Synapse synapse) {
-        Double oldWeight = synapse.getWeight();
-        Double newWeight = oldWeight + ALPHA * oldWeight + (RO * error * synapse.getInput());
+        double oldWeight = synapse.getOldWeight();
+        double currentWeight = synapse.getWeight();
+        synapse.setOldWeight(currentWeight);
+
+        double deltaWeight = currentWeight - oldWeight;
+        double newWeight = oldWeight + ALPHA * deltaWeight + (RO * error * synapse.getInput());
         synapse.setWeight(newWeight);
     }
 
